@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Import data
-filename = '../heart_failure_clinical_records_dataset.csv'
+filename = 'heart_failure_clinical_records_dataset.csv'
 data = pd.read_csv(filename)
 
 # Create test and train data
@@ -16,10 +16,11 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 
 # Make parameter dictionary for the grid search
 param_grid_rf = {'max_features': np.arange(1, 9, 1),
-                 'n_estimators': np.arange(500, 1000, 100)}
+                 'n_estimators': np.arange(75, 275, 15)}
+rfc = RandomForestClassifier(random_state=3)
 
 # Create the grid and fit the train data into it
-grid = GridSearchCV(RandomForestClassifier(), param_grid=param_grid_rf,
+grid = GridSearchCV(rfc, param_grid=param_grid_rf,
                     cv=5, return_train_score=True)
 
 grid.fit(X_train, y_train)
