@@ -19,13 +19,3 @@ plt.savefig('boxplot.png')
 
 
 
-# uden platelets
-Y = data['DEATH_EVENT']
-X = data.drop(['DEATH_EVENT', 'platelets'],axis = 1)
-plt.boxplot(X)
-plt.xticks(np.arange(1, X.shape[1] + 1), X.columns, rotation=45, ha="right", fontsize=12)
-plt.ylabel("DEATH EVENTS", fontsize=12)
-plt.yticks(fontsize=12)
-plt.savefig('boxplot.png')
-#plt.show()
-
