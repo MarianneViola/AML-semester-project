@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-def plot_acc(feature_range, test_scores, oob_scores, train_scores):
+def plot_acc(feature_range, test_scores, oob_scores, train_scores, variable_label):
     plt.figure(figsize=(12, 7))
 
     plt.plot(feature_range, test_scores, label="test scores")
@@ -9,7 +9,7 @@ def plot_acc(feature_range, test_scores, oob_scores, train_scores):
     plt.tick_params(axis='x', labelsize=20)
     plt.tick_params(axis='y', labelsize=20)
     plt.ylabel("accuracy", fontsize=20)
-    plt.xlabel("max_features", fontsize=20)
+    plt.xlabel(variable_label, fontsize=20)
     plt.show()
 
 
