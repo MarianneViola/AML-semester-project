@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from plot_accuracy import plot_acc
 
-filename = 'heart_failure_clinical_records_dataset.csv'
+filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
 
 # create x and y and make test and train data
@@ -14,7 +14,7 @@ train_scores = []
 test_scores = []
 oob_scores = []
 
-feature_range = range(1, 15, 1)
+feature_range = range(1, data.shape[1], 1)
 for max_features in feature_range:
     rf = RandomForestClassifier(max_features=max_features, oob_score=True, n_estimators=90, random_state=3)
     rf.fit(X_train, y_train)

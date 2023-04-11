@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Import data
-filename = 'heart_failure_clinical_records_dataset.csv'
+filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
 
 # Create test and train data
@@ -15,7 +15,7 @@ x,y = data.drop(['DEATH_EVENT'], axis=1), data['DEATH_EVENT']
 X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 
 # Make parameter dictionary for the grid search
-param_grid_rf = {'max_features': np.arange(1, 9, 1),
+param_grid_rf = {'max_features': np.arange(1, data.shape[1], 1),
                  'n_estimators': np.arange(75, 275, 15)}
 rfc = RandomForestClassifier(random_state=3)
 
@@ -35,7 +35,6 @@ print("test-set score: {:.3f}".format(grid.score(X_test, y_test)))
 results_df = pd.DataFrame(grid.cv_results_)
 pivot_table = pd.pivot_table(results_df, values='mean_test_score', index='param_n_estimators', columns='param_max_features')
 
-#pivot_table = pd.pivot_table(results_df, values='mean_test_score', index='param_n_estimators', columns='max_features')
 sns.heatmap(pivot_table, annot=True, cmap='YlGnBu')
 
 
