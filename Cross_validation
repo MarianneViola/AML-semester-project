@@ -1,0 +1,18 @@
+import pandas as pd
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.linear_model import LogisticRegression
+
+# Indlæs datasættet
+data = pd.read_csv('/Users/saralindvig/Desktop/8. Semester /AppliedMachine/Semesterproject /heart_failure_clinical_records_dataset.csv')
+
+# Opdel data i trænings- og testdatasæt
+X = data.drop('DEATH_EVENT', axis=1)
+y = data['DEATH_EVENT']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# logistisk regressionsmodel
+model = LogisticRegression()
+
+# 10-fold krydsvalidering og beregn gennemsnitsscoren
+scores = cross_val_score(model, X_train, y_train, cv=10)
+print("Gennemsnitlig score for 10-fold krydsvalidering:", scores.mean())
