@@ -1,0 +1,31 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+# Load the heart failure dataset
+df = pd.read_csv("heart_failure_clinical_records_dataset.csv")
+
+# Divide the dataset into male and female subgroups
+male_df = df.loc[df["sex"] == 1]
+female_df = df.loc[df["sex"] == 0]
+
+# Define the features and target variable
+features = ["age", "creatinine_phosphokinase", "ejection_fraction", "platelets", "serum_creatinine", "serum_sodium", "time"]
+target = "DEATH_EVENT"
+
+# Train and test a logistic regression model on the male subgroup
+X_train_m, X_test_m, y_train_m, y_test_m = train_test_split(male_df[features], male_df[target], test_size=0.2)
+lr_m = LogisticRegression()
+lr_m.fit(X_train_m, y_train_m)
+score_m = lr_m.score(X_test_m, y_test_m)
+
+# Train and test a logistic regression model on the female subgroup
+X_train_f, X_test_f, y_train_f, y_test_f = train_test_split(female_df[features], female_df[target], test_size=0.2)
+lr_f = LogisticRegression()
+lr_f.fit(X_train_f, y_train_f)
+score_f = lr_f.score(X_test_f, y_test_f)
+
+# Print the cross section results
+print("Cross section analysis based on gender:")
+print(f"Male subgroup score: {score_m}")
+print(f"Female subgroup score: {score_f}")
