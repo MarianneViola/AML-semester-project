@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 
 filename = '../heart_failure_clinical_records_dataset.csv'
 data = pd.read_csv(filename)
@@ -15,7 +14,7 @@ plt.xticks(np.arange(1, X.shape[1] + 1), X.columns, rotation=45, ha="right", fon
 plt.ylabel("DEATH EVENTS", fontsize=12)
 plt.yticks(fontsize=12)
 plt.savefig('boxplot.png')
-#plt.show()
+plt.show()
 
 
 

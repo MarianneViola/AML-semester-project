@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from plot_accuracy import plot_acc
+from sklearn.model_selection import cross_val_score
 
 filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
@@ -14,13 +15,15 @@ train_scores = []
 test_scores = []
 oob_scores = []
 
+
 feature_range = range(1, data.shape[1], 1)
 for max_features in feature_range:
-    rf = RandomForestClassifier(max_features=max_features, oob_score=True, n_estimators=90, random_state=3)
+    rf = RandomForestClassifier(max_features=max_features, oob_score=True, random_state=3)
     rf.fit(X_train, y_train)
     train_scores.append(rf.score(X_train, y_train))
     test_scores.append(rf.score(X_test, y_test))
     oob_scores.append(rf.oob_score_)
+
 
 plot_acc(feature_range, test_scores,oob_scores, train_scores,"max_features")
 
