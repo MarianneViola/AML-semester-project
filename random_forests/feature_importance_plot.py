@@ -16,8 +16,9 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 rfc = RandomForestClassifier(random_state=3, n_estimators=100, max_features=3)
 rfc.fit(X_train, y_train)
 
+plt.rcParams['figure.constrained_layout.use'] = True
 plt.barh(range(data.shape[1]-1), np.sort(rfc.feature_importances_[0:data.shape[1]-1]))
 plt.yticks(range(data.shape[1]-1), data.columns.tolist()[0:data.shape[1]-1])
-plt.tick_params(axis='x', labelsize=20)
-plt.tick_params(axis='y', labelsize=20)
+plt.tick_params(axis='x', labelsize=10)
+plt.tick_params(axis='y', labelsize=10)
 plt.show()
