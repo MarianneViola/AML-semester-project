@@ -22,4 +22,5 @@ boxplot = df.boxplot(column='time', ax=axes.flatten()[-1])
 axes.flatten()[-1].set_title('Boxplot of time')
 
 plt.tight_layout()
+plt.savefig('boxplot_seperated.png')
 plt.show()
