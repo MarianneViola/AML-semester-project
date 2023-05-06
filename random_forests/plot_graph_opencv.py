@@ -15,10 +15,8 @@ x,y = data.drop(['DEATH_EVENT'], axis=1), data['DEATH_EVENT']
 X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 
 # Make parameter dictionary for the grid search
-param_grid_rf = {'max_features': np.arange(1, data.shape[1], 1),
-                 'n_estimators': np.arange(75, 275, 15),
-                 'max_depth': np.arange(2,20, 2)}
-rfc = RandomForestClassifier(random_state=3, n_estimators=105, max_features=3)
+param_grid_rf = {'max_depth': np.arange(2, 20, 2)}
+rfc = RandomForestClassifier(random_state=3, max_leaf_nodes=14,n_estimators=135)
 
 # Create the grid and fit the train data into it
 grid = GridSearchCV(rfc, param_grid=param_grid_rf, cv=5, return_train_score=True, n_jobs=-1)
