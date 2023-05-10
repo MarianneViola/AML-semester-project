@@ -9,16 +9,13 @@ filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_re
 data = pd.read_csv(filename)
 
 # Create test and train data
-x,y = data.drop(['DEATH_EVENT'], axis=1), data['DEATH_EVENT']
+x, y = data[['time']], data['DEATH_EVENT']
 X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 
-# Scale the data using StandardScaler
+# Scale the data using RobustScaler
 scaler = RobustScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
-
-X_train_scaled = pd.DataFrame(X_train_scaled,columns = X_train.columns)['time']
-X_test_scaled = pd.DataFrame(X_test_scaled, columns = X_train.columns)['time']
 
 # Define the parameter grid for grid search
 param_grid = {

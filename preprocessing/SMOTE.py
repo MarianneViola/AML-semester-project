@@ -6,7 +6,7 @@ from keras.layers import Dense
 from sklearn.preprocessing import StandardScaler
 
 # Load the dataset
-heart_data = pd.read_csv('heart_failure_clinical_records_dataset.csv')
+heart_data = pd.read_csv('../heart_failure_clinical_records_dataset.csv')
 
 #Create an instance of the SMOTE class
 sm = SMOTE(random_state=42)
