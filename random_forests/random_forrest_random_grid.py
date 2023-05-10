@@ -9,7 +9,7 @@ filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_re
 data = pd.read_csv(filename)
 
 # Create test and train data
-X, y = data.drop(['DEATH_EVENT'], axis=1), data['DEATH_EVENT']
+X, y = data.drop(['DEATH_EVENT','sex'], axis=1), data['DEATH_EVENT']
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=3)
 
 # define the parameter distributions to search over

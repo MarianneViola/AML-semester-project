@@ -1,10 +1,11 @@
-from sklearn.ensemble import RandomForestClassifier
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
 import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, GridSearchCV
 import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.preprocessing import RobustScaler
 import seaborn as sns
+from sklearn.pipeline import Pipeline
 
 # Import data
 filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
@@ -16,10 +17,12 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=3)
 
 # Make parameter dictionary for the grid search
 param_grid_rf = {'max_leaf_nodes': np.arange(2, 50, 2)}
-rfc = RandomForestClassifier(random_state=3,n_estimators=135, max_depth = 6)
-
+svm = Pipeline([
+    ('scaler', RobustScaler()),
+    ('SVM', SVC(kernel='linear', probability=True, C=10, gamma = 0.01, degree = 2, coef0 = 0))
+])
 # Create the grid and fit the train data into it
-grid = GridSearchCV(rfc, param_grid=param_grid_rf, cv=5, return_train_score=True, n_jobs=-1)
+grid = GridSearchCV(svm, param_grid=param_grid_rf, cv=5, return_train_score=True, n_jobs=-1)
 
 grid.fit(X_train, y_train)
 

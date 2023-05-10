@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 # Import data
-filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
+filename = r"/heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
 
 # Create test and train data

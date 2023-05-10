@@ -19,7 +19,7 @@ scaler = RobustScaler()
 X_train = scaler.fit_transform(X_train)
 
 # Define the hyperparameter space to search over
-param_dist = {'penalty': ['l1', 'l2', 'elasticnet', 'none'],
+param_dist = {'penalty': ['l1', 'l2', 'elasticnet'],
               'C': np.logspace(-3, 3, 7),
               'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
               'max_iter': [100, 500, 1000]}

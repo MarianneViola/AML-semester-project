@@ -6,26 +6,30 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, accuracy_score
 from mlxtend.plotting import plot_confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 import seaborn as sns
 from sklearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
 
 # Import data
-filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
+filename = r"/heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
-
+#data = data.drop(['anaemia','smoking','diabetes','high_blood_pressure', 'sex'], axis = 1)
 
 # split the dataset into training and testing subsets
 train_df, test_df = train_test_split(data, test_size=0.2, random_state=3)
 
-
 # Create test and train data
-X_test,y_test = test_df.drop(['DEATH_EVENT'], axis=1), test_df['DEATH_EVENT']
-X_train,y_train = train_df.drop(['DEATH_EVENT'], axis=1), train_df['DEATH_EVENT']
+X_test, y_test = test_df.drop(['DEATH_EVENT'], axis=1), test_df['DEATH_EVENT']
+X_train, y_train = train_df.drop(['DEATH_EVENT'], axis=1), train_df['DEATH_EVENT']
+
+# make SMOTE
+sm = SMOTE(random_state=42)
+X_train, y_train = sm.fit_resample(X_train, y_train)
 
 ################################# random forests #########################
-# make random forrest classifier
-rfc = RandomForestClassifier(random_state=3,n_estimators=100, max_features=3)
+# make random forrest classifier - minimum impurity og max_depth
+rfc = RandomForestClassifier(random_state=3,n_estimators=135, max_leaf_nodes=14,max_depth=6)
 rfc.fit(X_train, y_train)
 
 # Predict the probabilities of the test set using the random forest classifier
@@ -40,7 +44,7 @@ roc_auc_rfc = auc(fpr_rfc, tpr_rfc)
 ############################### svm ##################################
 # Scale the data using StandardScaler
 svm = Pipeline([
-    ('scaler', StandardScaler()),
+    ('scaler', RobustScaler()),
     ('SVM', SVC(kernel='linear', probability=True, C=10, gamma = 0.01, degree = 2, coef0 = 0))
 ])
 svm.fit(X_train, y_train)
@@ -56,11 +60,9 @@ roc_auc_svm = auc(fpr_svm, tpr_svm)
 
 ############################### logistic regression #####################
 
-lr = LogisticRegression(C = 0.1, penalty = 'l2')
-
 lr = Pipeline([
-    ('scaler', StandardScaler()),
-    ('LR', LogisticRegression(C = 0.1, penalty = 'l2'))
+    ('scaler', RobustScaler()),
+    ('LR', LogisticRegression(C = 1, penalty = 'l2', solver='liblinear', max_iter=100))
 ])
 lr.fit(X_train, y_train)
 
@@ -75,7 +77,7 @@ roc_auc_lr = auc(fpr_lr, tpr_lr)
 ############### Plot the ROC curve ##########################
 plt.plot(fpr_rfc, tpr_rfc, color='darkorange', label='Random forrest (area = %0.2f)' % roc_auc_rfc)
 plt.plot(fpr_svm, tpr_svm, color='green', label='SVM (area = %0.2f)' % roc_auc_svm)
-plt.plot(fpr_lr, tpr_lr, color='red', label='linear regression (area = %0.2f)' % roc_auc_lr)
+plt.plot(fpr_lr, tpr_lr, color='red', label='logistic regression (area = %0.2f)' % roc_auc_lr)
 plt.plot([0, 1], [0, 1], color='navy',linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
@@ -145,22 +147,22 @@ tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_svm).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
 print(tn,tp,fn,fp)
-print("SVM sensitivity {}".format(sensitivity))
-print("SVM specificity {}".format(specificity))
+print("SVM sensitivity {:.3f}".format(sensitivity))
+print("SVM specificity {:.3f}".format(specificity))
 
 ## lr
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_lr).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
-print("lr sensitivity {}".format(sensitivity))
-print("lr specificity {}".format(specificity))
+print("lr sensitivity {:.3f}".format(sensitivity))
+print("lr specificity {:.3f}".format(specificity))
 
 ## rfc
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_rfc).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
-print("rfc sensitivity {}".format(sensitivity))
-print("rfc specificity {}".format(specificity))
+print("rfc sensitivity {:.3f}".format(sensitivity))
+print("rfc specificity {:.3f}".format(specificity))
 
 
 #################### Difference between genders ##########################
@@ -177,6 +179,7 @@ X_female_test, y_female_test = female_test_df.drop(['DEATH_EVENT'], axis=1), fem
 X_male_train, y_male_train = male_train_df.drop(['DEATH_EVENT'], axis=1), male_train_df['DEATH_EVENT']
 X_male_test, y_male_test = male_test_df.drop(['DEATH_EVENT'], axis=1), male_test_df['DEATH_EVENT']
 
+y_pred_test_svm = svm.predict(X_test_scaled)
 
 print("SVM Male test score {:.3f}".format(accuracy_score(y_male_test, svm.predict(X_male_test))))
 print("SVM Female test score {:.3f}".format(accuracy_score(y_female_test, svm.predict(X_female_test))))
