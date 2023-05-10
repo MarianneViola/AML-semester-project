@@ -10,9 +10,10 @@ from sklearn.preprocessing import RobustScaler
 import seaborn as sns
 from sklearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 
 # Import data
-filename = r"/heart_failure_clinical_records_dataset.csv"
+filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
 #data = data.drop(['anaemia','smoking','diabetes','high_blood_pressure', 'sex'], axis = 1)
 
@@ -24,8 +25,10 @@ X_test, y_test = test_df.drop(['DEATH_EVENT'], axis=1), test_df['DEATH_EVENT']
 X_train, y_train = train_df.drop(['DEATH_EVENT'], axis=1), train_df['DEATH_EVENT']
 
 # make SMOTE
-sm = SMOTE(random_state=42)
-X_train, y_train = sm.fit_resample(X_train, y_train)
+#sm = SMOTE(random_state=42)
+#X_train, y_train = sm.fit_resample(X_train, y_train)
+#rus = RandomUnderSampler(replacement=False)
+#X_train, y_train = rus.fit_resample(X_train, y_train)
 
 ################################# random forests #########################
 # make random forrest classifier - minimum impurity og max_depth
@@ -45,7 +48,7 @@ roc_auc_rfc = auc(fpr_rfc, tpr_rfc)
 # Scale the data using StandardScaler
 svm = Pipeline([
     ('scaler', RobustScaler()),
-    ('SVM', SVC(kernel='linear', probability=True, C=10, gamma = 0.01, degree = 2, coef0 = 0))
+    ('SVM', SVC(kernel='poly', probability=True, C=100, gamma = 0.01, degree = 2, coef0 = 2))
 ])
 svm.fit(X_train, y_train)
 
@@ -136,17 +139,11 @@ print("LR accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_lr)))
 print("RF accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_rfc)))
 print("")
 
-print("SVM accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_svm)))
-print("LR accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_lr)))
-print("RF accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_rfc)))
-print("")
-
 #################### Calculate sensitivity and specificity #######################
 ##svm
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_svm).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
-print(tn,tp,fn,fp)
 print("SVM sensitivity {:.3f}".format(sensitivity))
 print("SVM specificity {:.3f}".format(specificity))
 
