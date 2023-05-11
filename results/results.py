@@ -1,4 +1,4 @@
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
@@ -77,10 +77,23 @@ fpr_lr, tpr_lr,_ = roc_curve(y_test, y_proba)
 roc_auc_lr = auc(fpr_lr, tpr_lr)
 
 
+############## collecting models ##############################
+col = VotingClassifier(estimators=[('lr', lr), ('rf', rfc), ('svm', svm)], voting='soft')
+col = col.fit(X_train, y_train)
+
+
+y_proba = col.predict_proba(X_test)[:, 1]
+# Calculate the false positive rate, true positive rate, and thresholds using the ROC curve function
+fpr_col, tpr_col,_ = roc_curve(y_test, y_proba)
+
+# Calculate the area under the ROC curve
+roc_auc_col = auc(fpr_col, tpr_col)
+
 ############### Plot the ROC curve ##########################
 plt.plot(fpr_rfc, tpr_rfc, color='darkorange', label='Random forrest (area = %0.2f)' % roc_auc_rfc)
 plt.plot(fpr_svm, tpr_svm, color='green', label='SVM (area = %0.2f)' % roc_auc_svm)
 plt.plot(fpr_lr, tpr_lr, color='red', label='logistic regression (area = %0.2f)' % roc_auc_lr)
+plt.plot(fpr_col, tpr_col, color='purple', label='Collected model (area = %0.2f)' % roc_auc_col)
 plt.plot([0, 1], [0, 1], color='navy',linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
@@ -110,6 +123,7 @@ X_test_scaled = svm.named_steps['scaler'].transform(X_test)
 y_pred_test_svm = svm.predict(X_test)
 y_pred_test_lr = lr.predict(X_test)
 y_pred_test_rfc = rfc.predict(X_test)
+y_pred_test_col = col.predict(X_test)
 
 
 # Compute confusion matrices
@@ -137,6 +151,7 @@ for i, cm in enumerate(cms):
 print("SVM accuracy score {:.3f}".format(svm.score(X_test,y_test)))
 print("LR accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_lr)))
 print("RF accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_rfc)))
+print("col accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_col)))
 print("")
 
 #################### Calculate sensitivity and specificity #######################
@@ -160,6 +175,13 @@ sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
 print("rfc sensitivity {:.3f}".format(sensitivity))
 print("rfc specificity {:.3f}".format(specificity))
+
+## collected
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_col).ravel()
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
+print("SVM sensitivity {:.3f}".format(sensitivity))
+print("SVM specificity {:.3f}".format(specificity))
 
 
 #################### Difference between genders ##########################
