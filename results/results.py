@@ -38,7 +38,7 @@ X, y = data.drop(['DEATH_EVENT','sex'], axis=1), data['DEATH_EVENT']
 X_train_rfc, X_test_rfc, y_train_rfc, y_test_rfc = train_test_split(X, y, random_state=3)
 
 # make the model
-rfc = RandomForestClassifier(random_state=3,n_estimators=150, max_leaf_nodes=8,max_depth=18, max_features = 10)
+rfc = RandomForestClassifier(random_state=3,n_estimators=150, max_leaf_nodes=8,max_depth=18, max_features=10)
 rfc.fit(X_train_rfc, y_train_rfc)
 
 # Predict the probabilities of the test set using the random forest classifier
@@ -176,7 +176,7 @@ print("lr sensitivity {:.3f}".format(sensitivity))
 print("lr specificity {:.3f}".format(specificity))
 
 ## rfc
-tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_rfc).ravel()
+tn, fp, fn, tp = confusion_matrix(y_test_rfc, y_pred_test_rfc).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
 print("rfc sensitivity {:.3f}".format(sensitivity))
