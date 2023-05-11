@@ -24,22 +24,28 @@ train_df, test_df = train_test_split(data, test_size=0.2, random_state=3)
 X_test, y_test = test_df.drop(['DEATH_EVENT'], axis=1), test_df['DEATH_EVENT']
 X_train, y_train = train_df.drop(['DEATH_EVENT'], axis=1), train_df['DEATH_EVENT']
 
-# make SMOTE
+# SMOTE
 #sm = SMOTE(random_state=42)
 #X_train, y_train = sm.fit_resample(X_train, y_train)
-#rus = RandomUnderSampler(replacement=False)
-#X_train, y_train = rus.fit_resample(X_train, y_train)
+
+# undersampling
+rus = RandomUnderSampler(replacement=False)
+X_train, y_train = rus.fit_resample(X_train, y_train)
 
 ################################# random forests #########################
-# make random forrest classifier - minimum impurity og max_depth
-rfc = RandomForestClassifier(random_state=3,n_estimators=135, max_leaf_nodes=14,max_depth=6)
-rfc.fit(X_train, y_train)
+# select the features
+X, y = data.drop(['DEATH_EVENT','sex'], axis=1), data['DEATH_EVENT']
+X_train_rfc, X_test_rfc, y_train_rfc, y_test_rfc = train_test_split(X, y, random_state=3)
+
+# make the model
+rfc = RandomForestClassifier(random_state=3,n_estimators=150, max_leaf_nodes=8,max_depth=18, max_features = 10)
+rfc.fit(X_train_rfc, y_train_rfc)
 
 # Predict the probabilities of the test set using the random forest classifier
-y_proba = rfc.predict_proba(X_test)[:, 1]
+y_proba = rfc.predict_proba(X_test_rfc)[:, 1]
 
 # Calculate the false positive rate, true positive rate, and thresholds using the ROC curve function
-fpr_rfc, tpr_rfc, _ = roc_curve(y_test, y_proba)
+fpr_rfc, tpr_rfc, _ = roc_curve(y_test_rfc, y_proba)
 
 # Calculate the area under the ROC curve
 roc_auc_rfc = auc(fpr_rfc, tpr_rfc)
@@ -107,11 +113,11 @@ plt.legend(loc="lower right")
 
 y_pred_train_svm = svm.predict(X_train)
 y_pred_train_lr = lr.predict(X_train)
-y_pred_train_rfc = rfc.predict(X_train)
+y_pred_train_rfc = rfc.predict(X_train_rfc)
 
 cm_svm = confusion_matrix(y_train,y_pred_train_svm)
 cm_lr = confusion_matrix(y_train,y_pred_train_lr)
-cm_rfc = confusion_matrix(y_train,y_pred_train_rfc)
+cm_rfc = confusion_matrix(y_train_rfc,y_pred_train_rfc)
 
 fig_svm_train, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)
 fig_lr_train, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)
@@ -122,7 +128,7 @@ fig_rfc_train, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)
 X_test_scaled = svm.named_steps['scaler'].transform(X_test)
 y_pred_test_svm = svm.predict(X_test)
 y_pred_test_lr = lr.predict(X_test)
-y_pred_test_rfc = rfc.predict(X_test)
+y_pred_test_rfc = rfc.predict(X_test_rfc)
 y_pred_test_col = col.predict(X_test)
 
 
@@ -130,7 +136,7 @@ y_pred_test_col = col.predict(X_test)
 cms = []
 cms.append(confusion_matrix(y_test,y_pred_test_svm))
 cms.append(confusion_matrix(y_test,y_pred_test_lr))
-cms.append(confusion_matrix(y_test,y_pred_test_rfc))
+cms.append(confusion_matrix(y_test_rfc,y_pred_test_rfc))
 
 # Define label names
 labels = ['Negative', 'Positive']
@@ -150,7 +156,7 @@ for i, cm in enumerate(cms):
 #################### Calculate accuracy ##############################
 print("SVM accuracy score {:.3f}".format(svm.score(X_test,y_test)))
 print("LR accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_lr)))
-print("RF accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_rfc)))
+print("RF accuracy score {:.3f}".format(accuracy_score(y_test_rfc, y_pred_test_rfc)))
 print("col accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_col)))
 print("")
 
