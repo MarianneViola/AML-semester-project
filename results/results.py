@@ -114,6 +114,7 @@ plt.legend(loc="lower right")
 y_pred_train_svm = svm.predict(X_train)
 y_pred_train_lr = lr.predict(X_train)
 y_pred_train_rfc = rfc.predict(X_train_rfc)
+y_pred_train_col = col.predict(X_train)
 
 cm_svm = confusion_matrix(y_train,y_pred_train_svm)
 cm_lr = confusion_matrix(y_train,y_pred_train_lr)
@@ -160,7 +161,14 @@ print("RF accuracy score {:.3f}".format(accuracy_score(y_test_rfc, y_pred_test_r
 print("col accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_col)))
 print("")
 
+print("SVM train accuracy score {:.3f}".format(svm.score(X_train,y_train)))
+print("LR train accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_lr)))
+print("RF train accuracy score {:.3f}".format(accuracy_score(y_train_rfc, y_pred_train_rfc)))
+print("col train accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_col)))
+print("")
+
 #################### Calculate sensitivity and specificity #######################
+print("--------------test-----------------------")
 ##svm
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_svm).ravel()
 sensitivity = tp / (tp + fn)
@@ -186,9 +194,37 @@ print("rfc specificity {:.3f}".format(specificity))
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_col).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
+print("Col sensitivity {:.3f}".format(sensitivity))
+print("Col specificity {:.3f}".format(specificity))
+
+print("------------------train--------------------------")
+tn, fp, fn, tp = confusion_matrix(y_train, y_pred_train_svm).ravel()
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
 print("SVM sensitivity {:.3f}".format(sensitivity))
 print("SVM specificity {:.3f}".format(specificity))
 
+## lr
+tn, fp, fn, tp = confusion_matrix(y_train, y_pred_train_lr).ravel()
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
+print("lr sensitivity {:.3f}".format(sensitivity))
+print("lr specificity {:.3f}".format(specificity))
+
+## rfc
+tn, fp, fn, tp = confusion_matrix(y_train_rfc, y_pred_train_rfc).ravel()
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
+print("rfc sensitivity {:.3f}".format(sensitivity))
+print("rfc specificity {:.3f}".format(specificity))
+
+## collected
+tn, fp, fn, tp = confusion_matrix(y_train, y_pred_train_col).ravel()
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
+print("col sensitivity {:.3f}".format(sensitivity))
+print("col specificity {:.3f}".format(specificity))
+print("")
 
 #################### Difference between genders ##########################
 # filter the dataframe into two different genders
