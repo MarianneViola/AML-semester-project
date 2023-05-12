@@ -15,7 +15,6 @@ from imblearn.under_sampling import RandomUnderSampler
 # Import data
 filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_records_dataset.csv"
 data = pd.read_csv(filename)
-#data = data.drop(['anaemia','smoking','diabetes','high_blood_pressure', 'sex'], axis = 1)
 
 # split the dataset into training and testing subsets
 train_df, test_df = train_test_split(data, test_size=0.2, random_state=3)
@@ -34,32 +33,37 @@ X_train, y_train = rus.fit_resample(X_train, y_train)
 
 ################################# random forests #########################
 # select the features
-X, y = data.drop(['DEATH_EVENT','sex'], axis=1), data['DEATH_EVENT']
-X_train_rfc, X_test_rfc, y_train_rfc, y_test_rfc = train_test_split(X, y, random_state=3)
+X_train_rfc = X_train.drop(['sex'], axis=1)
+X_test_rfc = X_test.drop(['sex'], axis=1)
 
 # make the model
 rfc = RandomForestClassifier(random_state=3,n_estimators=150, max_leaf_nodes=8,max_depth=18, max_features=10)
-rfc.fit(X_train_rfc, y_train_rfc)
+rfc.fit(X_train_rfc, y_train)
 
 # Predict the probabilities of the test set using the random forest classifier
 y_proba = rfc.predict_proba(X_test_rfc)[:, 1]
 
 # Calculate the false positive rate, true positive rate, and thresholds using the ROC curve function
-fpr_rfc, tpr_rfc, _ = roc_curve(y_test_rfc, y_proba)
+fpr_rfc, tpr_rfc, _ = roc_curve(y_test, y_proba)
 
 # Calculate the area under the ROC curve
 roc_auc_rfc = auc(fpr_rfc, tpr_rfc)
 
 ############################### svm ##################################
+
+# Select the feature
+X_train_svm = X_train[['time']]
+X_test_svm = X_test[['time']]
+
 # Scale the data using StandardScaler
 svm = Pipeline([
     ('scaler', RobustScaler()),
     ('SVM', SVC(kernel='poly', probability=True, C=100, gamma = 0.01, degree = 2, coef0 = 2))
 ])
-svm.fit(X_train, y_train)
+svm.fit(X_train_svm, y_train)
 
-# Predict the probabilities of the test set using the random forest classifier
-y_proba = svm.predict_proba(X_test)[:, 1]
+# Predict the probabilities of the test set using the SVM classifier
+y_proba = svm.predict_proba(X_test_svm)[:, 1]
 
 # Calculate the false positive rate, true positive rate, and thresholds using the ROC curve function
 fpr_svm, tpr_svm, _ = roc_curve(y_test, y_proba)
@@ -111,59 +115,49 @@ plt.legend(loc="lower right")
 
 ##################### confusion matrix ################################
 
-y_pred_train_svm = svm.predict(X_train)
+y_pred_train_svm = svm.predict(X_train_svm)
 y_pred_train_lr = lr.predict(X_train)
 y_pred_train_rfc = rfc.predict(X_train_rfc)
 y_pred_train_col = col.predict(X_train)
 
 cm_svm = confusion_matrix(y_train,y_pred_train_svm)
 cm_lr = confusion_matrix(y_train,y_pred_train_lr)
-cm_rfc = confusion_matrix(y_train_rfc,y_pred_train_rfc)
+cm_rfc = confusion_matrix(y_train,y_pred_train_rfc)
+cm_col = confusion_matrix(y_train,y_pred_train_col)
 
 fig_svm_train, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)
 fig_lr_train, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)
 fig_rfc_train, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)
+fig_col_train, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)
 
 
 # find predicted data for the confusion matrix
-X_test_scaled = svm.named_steps['scaler'].transform(X_test)
-y_pred_test_svm = svm.predict(X_test)
+y_pred_test_svm = svm.predict(X_test_svm)
 y_pred_test_lr = lr.predict(X_test)
 y_pred_test_rfc = rfc.predict(X_test_rfc)
 y_pred_test_col = col.predict(X_test)
 
+cm_svm = confusion_matrix(y_test,y_pred_test_svm)
+cm_lr = confusion_matrix(y_test,y_pred_test_lr)
+cm_rfc = confusion_matrix(y_test,y_pred_test_rfc)
+cm_col = confusion_matrix(y_test,y_pred_test_col)
 
-# Compute confusion matrices
-cms = []
-cms.append(confusion_matrix(y_test,y_pred_test_svm))
-cms.append(confusion_matrix(y_test,y_pred_test_lr))
-cms.append(confusion_matrix(y_test_rfc,y_pred_test_rfc))
-
-# Define label names
-labels = ['Negative', 'Positive']
-
-# Define plot titles
-titles = ['Confusion Matrix (Counts)', 'Confusion Matrix (Normalized by Row)', 'Confusion Matrix (Normalized by Column)']
-
-# Plot confusion matrices as heatmaps
-for i, cm in enumerate(cms):
-    fig, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, cmap='Blues', fmt='g', xticklabels=labels, yticklabels=labels, ax=ax)
-    ax.set_xlabel('Predicted labels')
-    ax.set_ylabel('True labels')
-    ax.set_title(titles[i])
-    plt.show()
+fig_svm_test, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)
+fig_lr_test, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)
+fig_rfc_test, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)
+fig_col_test, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)
+plt.show()
 
 #################### Calculate accuracy ##############################
-print("SVM accuracy score {:.3f}".format(svm.score(X_test,y_test)))
+print("SVM accuracy score {:.3f}".format(svm.score(X_test_svm,y_test)))
 print("LR accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_lr)))
-print("RF accuracy score {:.3f}".format(accuracy_score(y_test_rfc, y_pred_test_rfc)))
+print("RF accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_rfc)))
 print("col accuracy score {:.3f}".format(accuracy_score(y_test, y_pred_test_col)))
 print("")
 
-print("SVM train accuracy score {:.3f}".format(svm.score(X_train,y_train)))
+print("SVM train accuracy score {:.3f}".format(svm.score(X_train_svm,y_train)))
 print("LR train accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_lr)))
-print("RF train accuracy score {:.3f}".format(accuracy_score(y_train_rfc, y_pred_train_rfc)))
+print("RF train accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_rfc)))
 print("col train accuracy score {:.3f}".format(accuracy_score(y_train, y_pred_train_col)))
 print("")
 
@@ -184,7 +178,7 @@ print("lr sensitivity {:.3f}".format(sensitivity))
 print("lr specificity {:.3f}".format(specificity))
 
 ## rfc
-tn, fp, fn, tp = confusion_matrix(y_test_rfc, y_pred_test_rfc).ravel()
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred_test_rfc).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
 print("rfc sensitivity {:.3f}".format(sensitivity))
@@ -212,7 +206,7 @@ print("lr sensitivity {:.3f}".format(sensitivity))
 print("lr specificity {:.3f}".format(specificity))
 
 ## rfc
-tn, fp, fn, tp = confusion_matrix(y_train_rfc, y_pred_train_rfc).ravel()
+tn, fp, fn, tp = confusion_matrix(y_train, y_pred_train_rfc).ravel()
 sensitivity = tp / (tp + fn)
 specificity = tn / (tn + fp)
 print("rfc sensitivity {:.3f}".format(sensitivity))
@@ -240,7 +234,6 @@ X_female_test, y_female_test = female_test_df.drop(['DEATH_EVENT'], axis=1), fem
 X_male_train, y_male_train = male_train_df.drop(['DEATH_EVENT'], axis=1), male_train_df['DEATH_EVENT']
 X_male_test, y_male_test = male_test_df.drop(['DEATH_EVENT'], axis=1), male_test_df['DEATH_EVENT']
 
-y_pred_test_svm = svm.predict(X_test_scaled)
 
 print("SVM Male test score {:.3f}".format(accuracy_score(y_male_test, svm.predict(X_male_test))))
 print("SVM Female test score {:.3f}".format(accuracy_score(y_female_test, svm.predict(X_female_test))))
@@ -249,4 +242,3 @@ print("LR Female test score {:.3f}".format(accuracy_score(y_female_test, lr.pred
 print("RFC Male test score {:.3f}".format(accuracy_score(y_male_test, rfc.predict(X_male_test))))
 print("RFC Female test score {:.3f}".format(accuracy_score(y_female_test,rfc.predict(X_female_test))))
 print("")
-

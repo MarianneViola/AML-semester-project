@@ -7,7 +7,7 @@ filename = r"C:\Users\flyve\PycharmProjects\AML_shared\heart_failure_clinical_re
 heart_data = pd.read_csv(filename)
 
 array = heart_data.values
-X = array[:,0:8]
+X =array[:,0:8]
 y = array[:,8]
 
 correlation = heart_data.corr().round(2)
