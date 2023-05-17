@@ -128,10 +128,10 @@ cm_lr = confusion_matrix(y_train,y_pred_train_lr)   #fig3
 cm_rfc = confusion_matrix(y_train,y_pred_train_rfc) #fig4
 cm_col = confusion_matrix(y_train,y_pred_train_col) #fig5
 
-fig_svm_train, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)   #fig6
-fig_lr_train, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)     #fig7
-fig_rfc_train, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)   #fig8
-fig_col_train, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)   #fig9
+fig_svm_train, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)  
+fig_lr_train, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)     
+fig_rfc_train, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)   
+fig_col_train, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)   
 
 
 # find predicted data for the confusion matrix
@@ -145,10 +145,10 @@ cm_lr = confusion_matrix(y_test,y_pred_test_lr)
 cm_rfc = confusion_matrix(y_test,y_pred_test_rfc)
 cm_col = confusion_matrix(y_test,y_pred_test_col)
 
-fig_svm_test, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)
-fig_lr_test, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)
-fig_rfc_test, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)
-fig_col_test, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)
+fig_svm_test, ax = plot_confusion_matrix(conf_mat=cm_svm, cmap=plt.cm.Blues)    #fig6
+fig_lr_test, ax = plot_confusion_matrix(conf_mat=cm_lr, cmap=plt.cm.Blues)      #fig7  
+fig_rfc_test, ax = plot_confusion_matrix(conf_mat=cm_rfc, cmap=plt.cm.Blues)    #fig8
+fig_col_test, ax = plot_confusion_matrix(conf_mat=cm_col, cmap=plt.cm.Blues)    #fig9
 plt.show()
 
 #################### Calculate accuracy ##############################
