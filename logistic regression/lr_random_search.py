@@ -7,11 +7,12 @@ from sklearn.preprocessing import RobustScaler
 
 # Load the dataset
 filename = "heart_failure_clinical_records_dataset.csv"
-heart_df = pd.read_csv(filename)
+data = pd.read_csv(filename)
+data = data.drop(['serum_creatinine'], axis=1)
 
 # Split the dataset into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(
-    heart_df.drop('DEATH_EVENT', axis=1), heart_df['DEATH_EVENT'],
+    data.drop('DEATH_EVENT', axis=1), data['DEATH_EVENT'],
     test_size=0.2, random_state=3)
 
 # scale
@@ -34,10 +35,11 @@ param_dist = {'penalty': ['l1', 'l2', 'elasticnet', 'None'],
 lr = LogisticRegression()
 
 # Create a random search object
-random_search = RandomizedSearchCV(lr, param_distributions=param_dist, cv=5, random_state=3)
+random_search = RandomizedSearchCV(lr, param_distributions=param_dist, cv=10, return_train_score=True, random_state=3)
 
 # Fit the model to the training data
 random_search.fit(X_train, y_train)
+results = pd.DataFrame(random_search.cv_results_)
 
 # Print the best hyperparameters and score
 print("Best hyperparameters: ", random_search.best_params_)
